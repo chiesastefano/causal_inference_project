@@ -27,10 +27,10 @@ histogram Wages, bin(40)
 
 
 // generating dummies for year
-levelsof Year, local(years)
-foreach year of local years {
-    generate Year_`year' = (Year == `year')
-}
+//levelsof Year, local(years)
+//foreach year of local years {
+  //  generate Year_`year' = (Year == `year')
+//}
 // add smt else?
 // Year_2021 omitted because of collinearity. - why if 2014 removed ?
 reg Wages Subsidies Taxes H_EMPE VA_PI Ip_Brand Ip_Tan Productivity CPI  ///
@@ -41,9 +41,12 @@ correlate Wages Subsidies Taxes H_EMPE VA_PI Ip_Brand Ip_Tan Productivity CPI  /
 vif
 
 // generating lagged productivity and regressing wages on it
-encode code, generate(code_numeric)
-xtset code_numeric Year
-generate Productivity_Lag1 = L.Productivity
+
+//encode code, generate(code_numeric)
+//xtset code_numeric Year
+//generate Productivity_Lag1 = L.Productivity
+
+
 // The regression on first lag is better than just on current productivity;
 // Lags 2 and so on also show better results, but due to decreasinf number of
 // observations I am not sure if that's a good idea to use them
@@ -51,10 +54,10 @@ reg Wages Productivity_Lag1
 
 
 // Dummies of each industry
-levelsof code_numeric, local(codes)
-foreach code_i of local codes {
-    generate Code_num_`code_i' = (code_numeric == `code_i')
-}
+//levelsof code_numeric, local(codes)
+//foreach code_i of local codes {
+//    generate Code_num_`code_i' = (code_numeric == `code_i')
+//}
 
 label var Code_num_1 "Mining and quarrying"
 label var Code_num_2 "Manufacturing"
@@ -83,12 +86,13 @@ reg Wages Productivity_Lag1 Code_num_2#Year_2020
 
 
 // productivity is  meaningfull with the full ecological regression (not robust). Some variables still are automatically dropped, I'm trying to find the interpretation of that
-reg Wages Productivity_Lag1 Code_num_1 Code_num_2 Code_num_3 Code_num_4 Code_num_5 Code_num_6 Code_num_7 Code_num_8 Code_num_9 Code_num_10 Code_num_11 Code_num_12 Code_num_13 Year_2014 Year_2015 Year_2016 Year_2017 Year_2018 Year_2019 Year_2020 Year_2021 Subsidies Taxes H_EMPE VA_PI Ip_Brand Ip_Tan Productivity CPI
+reg Wages Productivity_Lag1 Code_num_1 Code_num_2 Code_num_3 Code_num_4 Code_num_5 Code_num_6 Code_num_7 Code_num_8 Code_num_9 Code_num_10 Code_num_11 Code_num_12 Code_num_13 Year_2014 Year_2015 Year_2016 Year_2017 Year_2018 Year_2019 Year_2020 Year_2021 Subsidies Taxes H_EMPE VA_PI Ip_Brand Ip_Tan
 
 
 // productivity is not meaningfull with the full robust ecological regression. Some variables still are automatically dropped, I'm trying to find the interpretation of that
-reg Wages Productivity_Lag1 Code_num_1 Code_num_2 Code_num_3 Code_num_4 Code_num_5 Code_num_6 Code_num_7 Code_num_8 Code_num_9 Code_num_10 Code_num_11 Code_num_12 Code_num_13 Year_2014 Year_2015 Year_2016 Year_2017 Year_2018 Year_2019 Year_2020 Year_2021 Subsidies Taxes H_EMPE VA_PI Ip_Brand Ip_Tan Productivity CPI, r
+reg Wages Productivity_Lag1 Code_num_1 Code_num_2 Code_num_3 Code_num_4 Code_num_5 Code_num_6 Code_num_7 Code_num_8 Code_num_9 Code_num_10 Code_num_11 Code_num_12 Code_num_13 Year_2014 Year_2015 Year_2016 Year_2017 Year_2018 Year_2019 Year_2020 Year_2021 Subsidies Taxes H_EMPE VA_PI Ip_Brand Ip_Tan, r
 
 vif //crazy collinearity
-correlate Wages Productivity_Lag1 Code_num_1 Code_num_2 Code_num_3 Code_num_4 Code_num_5 Code_num_6 Code_num_7 Code_num_8 Code_num_9 Code_num_10 Code_num_11 Code_num_12 Code_num_13 Year_2014 Year_2015 Year_2016 Year_2017 Year_2018 Year_2019 Year_2020 Year_2021 Subsidies Taxes H_EMPE VA_PI Ip_Brand Ip_Tan Productivity CPI
+correlate Wages Productivity_Lag1 Code_num_1 Code_num_2 Code_num_3 Code_num_4 Code_num_5 Code_num_6 Code_num_7 Code_num_8 Code_num_9 Code_num_10 Code_num_11 Code_num_12 Code_num_13 Year_2014 Year_2015 Year_2016 Year_2017 Year_2018 Year_2019 Year_2020 Year_2021 Subsidies Taxes H_EMPE VA_PI Ip_Brand Ip_Tan Productivity
+
 
