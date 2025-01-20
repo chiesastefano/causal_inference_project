@@ -96,3 +96,12 @@ vif //crazy collinearity
 correlate Wages Productivity_Lag1 Code_num_1 Code_num_2 Code_num_3 Code_num_4 Code_num_5 Code_num_6 Code_num_7 Code_num_8 Code_num_9 Code_num_10 Code_num_11 Code_num_12 Code_num_13 Year_2014 Year_2015 Year_2016 Year_2017 Year_2018 Year_2019 Year_2020 Year_2021 Subsidies Taxes H_EMPE VA_PI Ip_Brand Ip_Tan
 
 
+reg Wages Productivity_Lag1 i.Year i.code_numeric Subsidies Taxes H_EMPE VA_PI Ip_Brand Ip_Tan, robust
+
+
+
+
+
+
+
+		 
