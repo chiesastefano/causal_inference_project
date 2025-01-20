@@ -27,10 +27,10 @@ histogram Wages, bin(40)
 
 
 // generating dummies for year
-//levelsof Year, local(years)
-//foreach year of local years {
-  //  generate Year_`year' = (Year == `year')
-//}
+levelsof Year, local(years)
+foreach year of local years {
+  generate Year_`year' = (Year == `year')
+ }
 // add smt else?
 // Year_2021 omitted because of collinearity. - why if 2014 removed ?
 reg Wages Subsidies Taxes H_EMPE VA_PI Ip_Brand Ip_Tan Productivity CPI  ///
@@ -42,9 +42,9 @@ vif
 
 // generating lagged productivity and regressing wages on it
 
-//encode code, generate(code_numeric)
-//xtset code_numeric Year
-//generate Productivity_Lag1 = L.Productivity
+encode code, generate(code_numeric)
+xtset code_numeric Year
+generate Productivity_Lag1 = L.Productivity
 
 
 // The regression on first lag is better than just on current productivity;
@@ -54,10 +54,10 @@ reg Wages Productivity_Lag1
 
 
 // Dummies of each industry
-//levelsof code_numeric, local(codes)
-//foreach code_i of local codes {
-//    generate Code_num_`code_i' = (code_numeric == `code_i')
-//}
+levelsof code_numeric, local(codes)
+foreach code_i of local codes {
+	generate Code_num_`code_i' = (code_numeric == `code_i')
+}
 
 label var Code_num_1 "Mining and quarrying"
 label var Code_num_2 "Manufacturing"
@@ -95,8 +95,115 @@ reg Wages Productivity_Lag1 Code_num_1 Code_num_2 Code_num_3 Code_num_4 Code_num
 vif //crazy collinearity
 correlate Wages Productivity_Lag1 Code_num_1 Code_num_2 Code_num_3 Code_num_4 Code_num_5 Code_num_6 Code_num_7 Code_num_8 Code_num_9 Code_num_10 Code_num_11 Code_num_12 Code_num_13 Year_2014 Year_2015 Year_2016 Year_2017 Year_2018 Year_2019 Year_2020 Year_2021 Subsidies Taxes H_EMPE VA_PI Ip_Brand Ip_Tan
 
-
+// final regression with fe
 reghdfe Wages Productivity_Lag1 Subsidies Taxes H_EMPE VA_PI Ip_Brand Ip_Tan, absorb(Year code_numeric)
+
+
+
+
+
+
+use "all_data", clear
+keep if (TypeofWorker == "Executive; white collar  " & ///
+         merge_taxes_1 == 3 & merge_subsidies_2 == 3 & ///
+		 merge_productivity_3 == 3 & ///
+         merge_capital_n_co_4 == 3 & merge_cpi_5 == 3)
+
+histogram Wages, bin(40)
+
+levelsof Year, local(years)
+foreach year of local years {
+  generate Year_`year' = (Year == `year')
+ }
+
+
+// generating lagged productivity and regressing wages on it
+
+encode code, generate(code_numeric)
+xtset code_numeric Year
+generate Productivity_Lag1 = L.Productivity
+
+
+
+// Dummies of each industry
+levelsof code_numeric, local(codes)
+foreach code_i of local codes {
+	generate Code_num_`code_i' = (code_numeric == `code_i')
+}
+
+label var Code_num_1 "Mining and quarrying"
+label var Code_num_2 "Manufacturing"
+label var Code_num_3 "Electricity, gas, steam and air conditioning supply"
+label var Code_num_4 "Water supply, sewerage, waste management and remediation activities"
+label var Code_num_5 "Transportation and storage"
+label var Code_num_6 "Accommodation and food service activities"
+label var Code_num_7 "Information and communication"
+label var Code_num_8 "Professional, scientific and technical activities"
+label var Code_num_9 "Administrative and support service activities"
+label var Code_num_10 "Education"
+label var Code_num_11 "Human health and social work activities"
+label var Code_num_12 "Arts, entertainment and recreation"
+label var Code_num_13 "Other service activities"
+
+
+// final regression with fe for white collars
+reghdfe Wages Productivity_Lag1 Subsidies Taxes H_EMPE VA_PI Ip_Brand Ip_Tan, absorb(Year code_numeric)
+
+
+
+
+
+
+use "all_data", clear
+keep if (TypeofWorker == "Blu collar  " & ///
+         merge_taxes_1 == 3 & merge_subsidies_2 == 3 & ///
+		 merge_productivity_3 == 3 & ///
+         merge_capital_n_co_4 == 3 & merge_cpi_5 == 3)
+
+histogram Wages, bin(40)
+
+levelsof Year, local(years)
+foreach year of local years {
+  generate Year_`year' = (Year == `year')
+ }
+
+
+// generating lagged productivity and regressing wages on it
+
+encode code, generate(code_numeric)
+xtset code_numeric Year
+generate Productivity_Lag1 = L.Productivity
+
+
+
+// Dummies of each industry
+levelsof code_numeric, local(codes)
+foreach code_i of local codes {
+	generate Code_num_`code_i' = (code_numeric == `code_i')
+}
+
+label var Code_num_1 "Mining and quarrying"
+label var Code_num_2 "Manufacturing"
+label var Code_num_3 "Electricity, gas, steam and air conditioning supply"
+label var Code_num_4 "Water supply, sewerage, waste management and remediation activities"
+label var Code_num_5 "Transportation and storage"
+label var Code_num_6 "Accommodation and food service activities"
+label var Code_num_7 "Information and communication"
+label var Code_num_8 "Professional, scientific and technical activities"
+label var Code_num_9 "Administrative and support service activities"
+label var Code_num_10 "Education"
+label var Code_num_11 "Human health and social work activities"
+label var Code_num_12 "Arts, entertainment and recreation"
+label var Code_num_13 "Other service activities"
+
+
+//final regression with fe for blue collars 
+reghdfe Wages Productivity_Lag1 Subsidies Taxes H_EMPE VA_PI Ip_Brand Ip_Tan, absorb(Year code_numeric)
+
+
+
+
+
 
 
 
