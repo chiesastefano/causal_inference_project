@@ -5,3 +5,8 @@ https://ec.europa.eu/eurostat/databrowser/view/nama_10_lp_ulc__custom_15109660/d
 
 Trade Union Density (% employees): 
 https://data-explorer.oecd.org/vis?df[ds]=DisseminateFinalDMZ&df[id]=DSD_TUD_CBC%40DF_TUD&df[ag]=OECD.ELS.SAE&dq=..&pd=2000%2C2020&to[TIME_PERIOD]=false&vw=tb
+
+Unemployment Rate: https://ec.europa.eu/eurostat/databrowser/view/tipsun20__custom_15110664/default/table?lang=en
+
+
+Business investment to GDP ratio: https://ec.europa.eu/eurostat/databrowser/view/nasa_10_ki__custom_15110878/default/table?lang=en
