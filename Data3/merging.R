@@ -67,8 +67,6 @@ for (value in unique_values) {
   assign(paste("t_", value, sep = ""), table)
 }
 
-# Now you have separate tables like t_GDP, t_Unemployment, etc.
-list_of_tables[["value1"]]
 
 
 
