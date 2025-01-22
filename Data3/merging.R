@@ -95,5 +95,5 @@ names(combined_data)[colnames(combined_data) == "Intermediate consumption"] <- "
 names(combined_data)[colnames(combined_data) == "Wages and salaries"] <- "wages_and_salaries"
 names(combined_data)[colnames(combined_data) == "Bankruptcy declarations Index"] <- "bankruptcy_declarations_index"
 write.csv(combined_data, "C:\\Users\\maidi\\OneDrive\\Desktop\\OneDrive - Università degli Studi di Milano\\causal_inference_project\\Data3\\combined_data.csv", row.names = FALSE)
-write_dta(combined_data, "C:\\Users\\maidi\\OneDrive\\Desktop\\OneDrive - Università degli Studi di Milano\\causal_inference_project\\Data3\\combined_data.csv")
+write_dta(combined_data, "C:\\Users\\maidi\\OneDrive\\Desktop\\OneDrive - Università degli Studi di Milano\\causal_inference_project\\Data3\\combined_data.dta")
 
