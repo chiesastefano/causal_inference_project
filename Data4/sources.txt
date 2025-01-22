@@ -12,3 +12,15 @@ Unemployment Rate: https://ec.europa.eu/eurostat/databrowser/view/tipsun20__cust
 Business investment to GDP ratio: https://ec.europa.eu/eurostat/databrowser/view/nasa_10_ki__custom_15110878/default/table?lang=en
 
 Bankruptcy and Registration index: https://ec.europa.eu/eurostat/web/products-datasets/-/sts_rb_a
+
+
+Participation in Training and Education (last 4 weeks, annualised, 15-64): https://ec.europa.eu/eurostat/databrowser/view/trng_lfs_09/default/table?lang=en
+
+Education Level, (Primary, Secondary and Tertiary), percentage, 15-64: 
+https://ec.europa.eu/eurostat/databrowser/view/edat_lfs_9915__custom_15117014/default/table?lang=en
+
+Percentage of Part time employees: https://ec.europa.eu/eurostat/databrowser/view/lfsa_eppgan__custom_15117102/default/table?lang=en
+
+
+HH Market concentration index By Country:
+https://wits.worldbank.org/CountryProfile/en/country/by-country/startyear/ltst/endyear/ltst/indicator/HH-MKT-CNCNTRTN-NDX#
