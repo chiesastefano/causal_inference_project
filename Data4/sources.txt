@@ -10,3 +10,5 @@ Unemployment Rate: https://ec.europa.eu/eurostat/databrowser/view/tipsun20__cust
 
 
 Business investment to GDP ratio: https://ec.europa.eu/eurostat/databrowser/view/nasa_10_ki__custom_15110878/default/table?lang=en
+
+Bankruptcy and Registration index: https://ec.europa.eu/eurostat/web/products-datasets/-/sts_rb_a
