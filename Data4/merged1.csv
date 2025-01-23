@@ -1,4 +1,4 @@
-"geo","TIME_PERIOD","hourly_wages","hicp","business_investment","low_education","middle_education","high_education","hh_index","partime_contracts","productivity_pp","productivity_1","productivity_2","realgdp_pc","tradeunion_density","training_education_l4w","unemployment"
+"geo","year","hourly_wages","hicp","business_investment","low_education","middle_education","high_education","hh_index","partime_contracts","productivity_pp","productivity_1","productivity_2","realgdp_pc","tradeunion_density","training_education_l4w","unemployment"
 "Austria",2009,27.9783393501805,88.64,13.23,23.8,60.2,16,0.109959406300084,23.9,98.285,101.394,101.839,38200,29.299999,16.8,5.7
 "Austria",2010,27.8455735522521,90.14,12.84,23.2,60.5,16.2,0.11244998943061,24.4,99.313,98.285,101.394,38800,28.9,16.9,5.2
 "Austria",2011,27.4236743438672,93.35,14.34,23.1,60.6,16.3,0.112295812119275,24.5,100.655,99.313,98.285,39800,28.299999,16.7,4.9

@@ -1,4 +1,6 @@
-  library(readxl)
+setwd("C:\\Users\\maidi\\OneDrive\\Desktop\\OneDrive - Università degli Studi di Milano\\causal_inference_project\\Data4")
+
+library(readxl)
   library(data.table) # or library(readr)
   
   # Get the list of all files in the directory
@@ -152,6 +154,7 @@
   result_df_clean <- result_df_clean %>%
     rename(
       hourly_wages = adjusted_wages.y,
+      year = TIME_PERIOD
     )
   
   
