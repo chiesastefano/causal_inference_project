@@ -1,4 +1,5 @@
-Median Hourly Wages: https://ec.europa.eu/eurostat/databrowser/view/earn_ses_pub2s/default/table?lang=en
+Median Hourly Compensation: 
+https://ec.europa.eu/eurostat/databrowser/view/nama_10r_2lp10__custom_15127183/default/table?lang=en
 
 Real Labour Productivity per person (index 2020):
 https://ec.europa.eu/eurostat/databrowser/view/nama_10_lp_ulc__custom_15109660/default/table?lang=en
@@ -26,9 +27,6 @@ Percentage of Part time employees: https://ec.europa.eu/eurostat/databrowser/vie
 
 HH Market concentration index By Country:
 https://wits.worldbank.org/CountryProfile/en/country/by-country/startyear/ltst/endyear/ltst/indicator/HH-MKT-CNCNTRTN-NDX#
-
-Job Vacancy Rate: https://ec.europa.eu/eurostat/databrowser/view/jvs_a_rate_r2__custom_15121033/default/table?lang=en
-
 
 
 Annual HICP: https://ec.europa.eu/eurostat/databrowser/view/prc_hicp_aind__custom_15121621/default/table?lang=en
