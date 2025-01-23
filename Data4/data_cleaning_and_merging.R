@@ -142,7 +142,7 @@ library(readxl)
   
   # Count NA values for each column in the resulting dataframe
   na_count <- sapply(result_df, function(x) sum(is.na(x)))
-  
+
   # Print the NA count
   print(na_count)
   
