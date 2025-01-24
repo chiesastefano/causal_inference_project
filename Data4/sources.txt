@@ -1,4 +1,4 @@
-Median Hourly Compensation: 
+Compensation of employees per hour worked: 
 https://ec.europa.eu/eurostat/databrowser/view/nama_10r_2lp10__custom_15127183/default/table?lang=en
 
 Real Labour Productivity per person (index 2020):
