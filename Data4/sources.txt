@@ -29,16 +29,4 @@ HH Market concentration index By Country:
 https://wits.worldbank.org/CountryProfile/en/country/by-country/startyear/ltst/endyear/ltst/indicator/HH-MKT-CNCNTRTN-NDX#
 
 
-Annual HICP: https://ec.europa.eu/eurostat/databrowser/view/prc_hicp_aind__custom_15121621/default/table?lang=en
-
-
-
-*Trial for IV*
-
-Patents https://ec.europa.eu/eurostat/databrowser/view/pat_ep_tot__custom_15144985/default/table?lang=en
-
-RnD Expenditures
-https://ec.europa.eu/eurostat/databrowser/view/rd_e_gerdcost__custom_15144998/default/table?lang=en
-
-Globalization index
-https://kof.ethz.ch/en/forecasts-and-indicators/indicators/kof-globalisation-index.html
+Annual HICP (2015=100, then indexed 2020=100): https://ec.europa.eu/eurostat/databrowser/view/prc_hicp_aind__custom_15121621/default/table?lang=en
