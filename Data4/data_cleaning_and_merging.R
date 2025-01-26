@@ -99,6 +99,25 @@ library(readxl)
     ungroup()
   
   
+  # Filter out countries with no value for 2020
+  hicp <- hicp %>%
+    group_by(geo) %>%
+    filter(any(TIME_PERIOD == 2020)) %>% # Keep only groups with 2020 data
+    ungroup()
+  
+  # Rebase the HICP and replace the original column
+  hicp <- hicp %>%
+    group_by(geo) %>%
+    mutate(
+      base_value_2020 = hicp[TIME_PERIOD == 2020], # Extract 2020 index
+      hicp = (hicp / base_value_2020) * 100        # Rebase and overwrite
+    ) %>%
+    select(-base_value_2020) %>% # Drop the intermediate column
+    ungroup()
+  
+  # View the updated dataframe
+  print(hicp)
+  
   # Function to merge and adjust wages
   adjust_wages_with_hicp <- function(wages_df, hicp_df) {
     # Merge dataframes on geo and TIME_PERIOD
