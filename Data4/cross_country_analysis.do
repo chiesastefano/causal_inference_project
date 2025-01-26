@@ -5,6 +5,23 @@ use merged_NA, clear
 encode geo, gen(geo_num)
 xtset geo_num year
 
+// generating percentage changes
+gen pct_change_wages = (D.hourly_wages / L.hourly_wages) * 100
+gen pct_change_productivity = (D.productivity_pp / L.productivity_pp) * 100
+gen pct_change_productivity_1 = (D.productivity_1 / L.productivity_1) * 100
+gen pct_change_productivity_2 = (D.productivity_2 / L.productivity_2) * 100
+gen pct_change_gdp = (D.realgdp_pc / L.realgdp_pc) * 100
+
+// correlations
+pwcorr pct_change_wages hourly_wages hicp business_investment ///
+       high_education hh_index productivity_pp pct_change_gdp ///
+	   realgdp_pc tradeunion_density pct_change_productivity ///
+	   pct_change_productivity_1 pct_change_productivity_2 partime_contracts ///
+	   unemployment, sig
+matrix corrmatrix = r(C)
+heatplot corrmatrix, lower values(format(%9.2f)) legend(off)  ///
+         title("Correlation Heatmap") xlabel(, angle(45))
+
 summarize //, detail
 
 // some plots, TODO decide which we need and save 
@@ -40,10 +57,10 @@ heatplot corrmatrix, lower values(format(%9.2f)) legend(off)  ///
 // from the above, we can't include al 3 productivities because of issue of 
 // multicollinearity; as well we can't include all 3 levels of education
 
-// some preliminary regression, excluded tradeunion_density and unemployment
-reghdfe hourly_wages hicp business_investment  ///
-        hh_index partime_contracts ///
-	    productivity_1 realgdp_pc, absorb(geo year)
+// some preliminary regression
+reghdfe pct_change_wages pct_change_gdp  ///
+        partime_contracts business_investment ///
+	    unemployment tradeunion_density, absorb(geo year)
 		// training_education_l4w middle_education high_education
 vif, uncentered
 
@@ -105,6 +122,12 @@ drop if missing(diff_hourly_wages) | missing(diff_productivity)
 xtgcause diff_hourly_wages diff_productivity
 xtgcause diff_productivity diff_hourly_wages
 
+// from below, wages cause productivity, but productivity doesn't cause wages
+drop if missing(pct_change_wages) | missing(pct_change_productivity)
+xtgcause pct_change_wages pct_change_productivity
+xtgcause pct_change_productivity pct_change_wages
+
+
 
 // for first order difference)
 generate diff_hourly_wages = D.hourly_wages
@@ -155,5 +178,4 @@ twoway (scatter mean_wages mean_productivity if cluster_id == 1, mcolor(blue)) /
         (scatter mean_wages mean_productivity if cluster_id == 2, mcolor(red)) ///
 		(scatter mean_wages mean_productivity if cluster_id == 3, mcolor(green)), ///
 		legend(label(1 "cluster_id == 1") label(2 "cluster_id == 2") label(3 "cluster_id == 3"))
-
 
