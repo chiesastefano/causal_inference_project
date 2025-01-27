@@ -7,35 +7,113 @@ xtset geo_num year
 
 // generating percentage changes
 gen pct_change_wages = (D.hourly_wages / L.hourly_wages) * 100
+label var pct_change_wages "Percentage change in hourly wages compared to previous year"
 gen pct_change_productivity = (D.productivity_pp / L.productivity_pp) * 100
+label var pct_change_productivity "Percentage change in productivity compared to previous year"
 gen pct_change_productivity_1 = (D.productivity_1 / L.productivity_1) * 100
-gen pct_change_productivity_2 = (D.productivity_2 / L.productivity_2) * 100
+label var pct_change_productivity_1 "Lagged percentage change in productivity compared to previous year"
 gen pct_change_gdp = (D.realgdp_pc / L.realgdp_pc) * 100
+label var pct_change_gdp "Percentage change in GDP compared to previous year"
 
-// correlations
-pwcorr pct_change_wages hourly_wages hicp business_investment ///
-       high_education hh_index productivity_pp pct_change_gdp ///
-	   realgdp_pc tradeunion_density pct_change_productivity ///
-	   pct_change_productivity_1 pct_change_productivity_2 partime_contracts ///
-	   unemployment, sig
-matrix corrmatrix = r(C)
-heatplot corrmatrix, lower values(format(%9.2f)) legend(off)  ///
-         title("Correlation Heatmap") xlabel(, angle(45))
+// Checking within-unit variation of variables, which should not be zero for
+// fixed effect to work well. Excluding hh_index (=0.015)
+xtsum hourly_wages hicp business_investment low_education middle_education ///
+      high_education hh_index partime_contracts productivity_pp ///
+	  productivity_1 productivity_2 realgdp_pc tradeunion_density ///
+	  training_education_l4w unemployment pct_change_wages ///
+	  pct_change_productivity pct_change_gdp
 
 summarize //, detail
+	  
+// correlations with of some variables and their significance
+pwcorr hourly_wages pct_change_wages hicp business_investment ///
+       low_education middle_education high_education ///
+	   productivity_pp productivity_1 pct_change_productivity ///
+	   pct_change_productivity_1 realgdp_pc pct_change_gdp ///
+	   tradeunion_density partime_contracts ///
+	   unemployment training_education_l4w, sig
+matrix corrmatrix = r(C)
+heatplot corrmatrix, lower values(format(%9.1f)) legend(off)  ///
+         title("Correlation Heatmap") xlabel(, angle(45))
+// from the above, we can't include in the same model:
+// - productivity and its lag, due to perfect multicollinearity 
+// - low_education and middle_education, due to multicollinearity 
+// - percentage change in productivity and percentage change in gdp, due to multicollinearity
+
+
+
+
+// Percentage change models
+
+// Just productivity and FE
+reghdfe pct_change_wages pct_change_productivity, absorb(geo year) resid(residuals)
+// Check for exogenouity, passed (correlation not significant under 0.05)
+pwcorr pct_change_productivity_1 residuals, sig
+drop residuals
+// full data, robust standart errors to deal with heteroscedasticity (as in all below)
+reghdfe pct_change_wages pct_change_productivity tradeunion_density hicp business_investment middle_education high_education partime_contracts realgdp_pc training_education_l4w unemployment, absorb(geo year) vce (robust)
+// full data without hicp, unemployment and tradeunion_density to get more data
+reghdfe pct_change_wages pct_change_productivity business_investment middle_education high_education partime_contracts realgdp_pc training_education_l4w, absorb(geo year) vce (robust)
+// removing some non significant variables and keeping significant
+reghdfe pct_change_wages pct_change_productivity tradeunion_density business_investment unemployment, absorb(geo year) vce (robust)
+
+// Conclusion from above - coefficient for productivity change is quite stable (between 0.35 and 0.42), almost always significant, the same for unemployment. Other variables not so good
+
+
+
+
+// Models with real values and productivity lag
+
+// Just productivity and FE
+reghdfe hourly_wages productivity_1, absorb(geo year) resid(residuals)
+// Check for exogenouity, passed
+pwcorr productivity_1 residuals, sig
+// graph, but I am not sure it's a good idea to put it inside of report
+twoway scatter residuals productivity_1, ///
+xlabel(, grid) ylabel(, grid) ///
+title("Correlation between Productivity_1 and Residuals") ///
+xtitle("Productivity_1") ytitle("Residuals")
+
+// full data, robust standart errors to deal with heteroscedasticity (as in all below)
+reghdfe hourly_wages productivity_1 tradeunion_density hicp business_investment middle_education high_education partime_contracts realgdp_pc training_education_l4w unemployment, absorb(geo year) vce (robust)
+// full data without hicp, unemployment and tradeunion_density to get more data
+reghdfe hourly_wages productivity_1 business_investment middle_education high_education partime_contracts realgdp_pc training_education_l4w, absorb(geo year) vce (robust)
+// removing some non significant variables and keeping significant
+reghdfe hourly_wages productivity_1 unemployment tradeunion_density middle_education, absorb(geo year) vce (robust)
+vif, uncentered
+
+// Summary of above: estimate for productivity varies from 0.028 to 0.041, which is quite good; quite significant
+// vif is a bit worse than in percentage change model, but not too much
+
+
+
+
+
+// distribution of wages among countries
+graph box hourly_wages, over(geo, label(angle(45)))
+// from the graph above, it is quite visible division between countries with threshold of 20, so wanted to check their difference
+
+// checking what if divide wages by threshold of 20
+egen mean_wages = mean(hourly_wages), by(geo)
+tabulate geo if mean_wages <= 20
+tabulate geo if mean_wages > 20
+
+// keeping significant/important variabless for <= 20
+reghdfe hourly_wages productivity_1 unemployment tradeunion_density if mean_wages <= 20, absorb(geo year) vce (robust)
+
+// keeping significant/important variabless for > 20
+reghdfe hourly_wages productivity_1 unemployment tradeunion_density if mean_wages > 20, absorb(geo year) vce (robust)
+
+// TODO discuss difference in coefficients and significance of the above...
+
+
+
+
+// Random stuff
 
 // some plots, TODO decide which we need and save 
-histogram hourly_wages, bin(50)
-// distributions among countries. What if divide our analysis by two sets of countries with 20 as threshold?
-graph box hourly_wages, over(geo, label(angle(45)))
-
 scatter hourly_wages productivity_1
-
-// checking what if divide by threshold
-egen mean_wages = mean(hourly_wages), by(geo)
-twoway scatter hourly_wages productivity_1 if mean_wages > 20
-// correlation changes from 0.30 if take all data to 0.44 if take this:
-correlate hourly_wages productivity_1 if mean_wages <= 20
+scatter pct_change_wages pct_change_productivity
 
 
 twoway (scatter hourly_wages productivity_1 if tradeunion_density < 40, mcolor(blue)) ///
@@ -44,129 +122,12 @@ twoway (scatter hourly_wages productivity_1 if tradeunion_density < 40, mcolor(b
         title("Hourly Wages vs. Productivity", color(black)) ///
         xtitle("Productivity") ytitle("Hourly Wages")
 
-
-
-// correlation with of some variables and their significance
-pwcorr hourly_wages hicp business_investment low_education middle_education ///
-       high_education hh_index partime_contracts productivity_pp ///
-	   productivity_1 productivity_2 realgdp_pc tradeunion_density ///
-	   training_education_l4w unemployment, sig
-matrix corrmatrix = r(C)
-heatplot corrmatrix, lower values(format(%9.2f)) legend(off)  ///
-         title("Correlation Heatmap") xlabel(, angle(45))
-// from the above, we can't include al 3 productivities because of issue of 
-// multicollinearity; as well we can't include all 3 levels of education
-
-// some preliminary regression
-reghdfe pct_change_wages pct_change_gdp  ///
-        partime_contracts business_investment ///
-	    unemployment tradeunion_density, absorb(geo year)
-		// training_education_l4w middle_education high_education
-vif, uncentered
-
-
-// let's try with -1 productivity and complete regression
-reghdfe hourly_wages tradeunion_density productivity_1 hicp business_investment low_education middle_education high_education hh_index partime_contracts realgdp_pc training_education_l4w unemployment, absorb(geo year)
-	
- // let's try with -2 productivity
-reghdfe hourly_wages tradeunion_density productivity_2 hicp business_investment low_education middle_education high_education hh_index partime_contracts realgdp_pc training_education_l4w unemployment, absorb(geo year)
-
-
-// let's try with more years of productivity
-reghdfe hourly_wages tradeunion_density productivity_pp productivity_1 productivity_2 hicp business_investment low_education middle_education high_education low_education hh_index partime_contracts realgdp_pc training_education_l4w unemployment, absorb(geo year)
-
-
-// is productivity_1 exogenous? Yes
-// drop residuals
-reghdfe hourly_wages productivity_1, absorb(geo year) resid(residuals)
-corr productivity_pp residuals
-
-twoway scatter residuals productivity_1, ///
-xlabel(, grid) ylabel(, grid) ///
-title("Correlation between Productivity_1 and Residuals") ///
-xtitle("Productivity_pp") ytitle("Residuals")
-
-
-
-// same for productivity_2
-drop residuals
-reghdfe hourly_wages productivity_2, absorb(geo year) resid(residuals)
-corr productivity_pp residuals
-
-twoway scatter residuals productivity_2, ///
-xlabel(, grid) ylabel(, grid) ///
-title("Correlation between Productivity_2 and Residuals") ///
-xtitle("Productivity_pp") ytitle("Residuals")
-
-
-
-
-// add control variables
-drop residuals
-reghdfe hourly_wages productivity_1 tradeunion_density unemployment hh_index, absorb(geo year) resid(residuals)
-corr productivity_pp residuals
-vif, uncentered
-
-
-
-
-
-// SOME experiments for data compliance with assumptions
-
-// for reverse causality between productivity and wages
-drop if missing(hourly_wages) | missing(productivity_pp)
-xtgcause hourly_wages productivity_pp, lags(2)
-xtgcause productivity_pp hourly_wages, lags(2)
-
-drop if missing(diff_hourly_wages) | missing(diff_productivity)
-xtgcause diff_hourly_wages diff_productivity
-xtgcause diff_productivity diff_hourly_wages
-
-// from below, wages cause productivity, but productivity doesn't cause wages
-drop if missing(pct_change_wages) | missing(pct_change_productivity)
-xtgcause pct_change_wages pct_change_productivity
-xtgcause pct_change_productivity pct_change_wages
-
-
-
-// for first order difference)
-generate diff_hourly_wages = D.hourly_wages
-generate diff_productivity = D.productivity_pp
-reghdfe diff_hourly_wages diff_productivity tradeunion_density unemployment hh_index, absorb(geo year)
-
-reghdfe hourly_wages productivity_1 tradeunion_density unemployment hh_index, absorb(geo year)
-
-// Checking within-unit variation of variables, which should not be zero. hh_index causes conserns (=0.015)
-xtsum hourly_wages hicp business_investment low_education middle_education ///
-      high_education hh_index partime_contracts productivity_pp ///
-	  productivity_1 productivity_2 realgdp_pc tradeunion_density ///
-	  training_education_l4w unemployment
-
-	  
-// check for serial correlation (if p<0.05, there is serial correlation). And it is present for normal data, but absent for first order differenced
-xtserial diff_hourly_wages diff_productivity
-xtserial hourly_wages productivity_1
-
-// heteroscedasticity??
-xtreg diff_hourly_wages diff_productivity, fe vce(robust)
-xttest3
-
-// Cross-Sectional Dependence???
-xtcsd, pesaran abs
-
-
-
-// robust standart errors to deal with issues
-xtreg hourly_wages productivity_1 tradeunion_density unemployment hh_index, fe vce(cluster geo_num)
-
-
 // Charts of some countries over time
 xtline hourly_wages if geo == "Italy" | geo == "France" | geo == "Germany" | geo == "Poland" | geo == "Netherlands", overlay
-xtline productivity_pp if geo == "Italy" | geo == "France" | geo == "Germany" | geo == "Poland" | geo == "Netherlands", overlay
+xtline productivity_1 if geo == "Italy" | geo == "France" | geo == "Germany" | geo == "Poland" | geo == "Netherlands", overlay
 
 
 // Just an experiment trying to cluster countries based on productivity and wages
-egen mean_wages = mean(hourly_wages), by(geo)
 egen mean_productivity = mean(productivity_pp), by(geo)
 collapse (mean) mean_wages mean_productivity, by(geo)
 cluster kmeans mean_wages mean_productivity, k(3) name(Clusters)
