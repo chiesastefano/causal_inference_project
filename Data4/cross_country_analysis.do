@@ -46,16 +46,17 @@ heatplot corrmatrix, lower values(format(%9.1f)) legend(off)  ///
 // Percentage change models
 
 // Just productivity and FE
-reghdfe pct_change_wages pct_change_productivity, absorb(geo year) resid(residuals)
+reghdfe pct_change_wages pct_change_productivity_1, absorb(geo year) resid(residuals)
 // Check for exogenouity, passed (correlation not significant under 0.05)
 pwcorr pct_change_productivity_1 residuals, sig
 drop residuals
-// full data, robust standart errors to deal with heteroscedasticity (as in all below)
-reghdfe pct_change_wages pct_change_productivity tradeunion_density hicp business_investment middle_education high_education partime_contracts realgdp_pc training_education_l4w unemployment, absorb(geo year) vce (robust)
+// full data, robust standart errors to deal with heteroscedasticity (as in all below) - THE MAIN REGRESSION WE WERE TALKING 
+reghdfe pct_change_wages pct_change_productivity_1 pct_change_gdp tradeunion_density hicp business_investment middle_education high_education partime_contracts realgdp_pc training_education_l4w unemployment, absorb(geo year) vce (robust)
+
 // full data without hicp, unemployment and tradeunion_density to get more data
-reghdfe pct_change_wages pct_change_productivity business_investment middle_education high_education partime_contracts realgdp_pc training_education_l4w, absorb(geo year) vce (robust)
+reghdfe pct_change_wages pct_change_productivity_1 business_investment middle_education high_education partime_contracts realgdp_pc training_education_l4w, absorb(geo year) vce (robust)
 // removing some non significant variables and keeping significant
-reghdfe pct_change_wages pct_change_productivity tradeunion_density business_investment unemployment, absorb(geo year) vce (robust)
+reghdfe pct_change_wages pct_change_productivity_1 tradeunion_density business_investment unemployment, absorb(geo year) vce (robust)
 
 // Conclusion from above - coefficient for productivity change is quite stable (between 0.35 and 0.42), almost always significant, the same for unemployment. Other variables not so good
 
@@ -90,6 +91,7 @@ vif, uncentered
 
 
 // distribution of wages among countries
+
 graph box hourly_wages, over(geo, label(angle(45)))
 // from the graph above, it is quite visible division between countries with threshold of 20, so wanted to check their difference
 
@@ -98,11 +100,11 @@ egen mean_wages = mean(hourly_wages), by(geo)
 tabulate geo if mean_wages <= 20
 tabulate geo if mean_wages > 20
 
-// keeping significant/important variabless for <= 20
-reghdfe hourly_wages productivity_1 unemployment tradeunion_density if mean_wages <= 20, absorb(geo year) vce (robust)
+// full data for <= 20
+reghdfe pct_change_wages pct_change_productivity_1 pct_change_gdp tradeunion_density hicp business_investment middle_education high_education partime_contracts realgdp_pc training_education_l4w unemployment if mean_wages <= 20, absorb(geo year) vce (robust)
 
-// keeping significant/important variabless for > 20
-reghdfe hourly_wages productivity_1 unemployment tradeunion_density if mean_wages > 20, absorb(geo year) vce (robust)
+// full data for > 20
+reghdfe pct_change_wages pct_change_productivity_1 pct_change_gdp tradeunion_density hicp business_investment middle_education high_education partime_contracts realgdp_pc training_education_l4w unemployment if mean_wages > 20, absorb(geo year) vce (robust)
 
 // TODO discuss difference in coefficients and significance of the above...
 
