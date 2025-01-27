@@ -14,6 +14,8 @@ gen pct_change_productivity_1 = (D.productivity_1 / L.productivity_1) * 100
 label var pct_change_productivity_1 "Lagged percentage change in productivity compared to previous year"
 gen pct_change_gdp = (D.realgdp_pc / L.realgdp_pc) * 100
 label var pct_change_gdp "Percentage change in GDP compared to previous year"
+gen pct_change_hicp = (D.hicp/L.hicp)*100
+label var pct_change_hicp "Percentage change in HICP"
 
 // Checking within-unit variation of variables, which should not be zero for
 // fixed effect to work well. Excluding hh_index (=0.015)
@@ -130,15 +132,57 @@ xtline productivity_1 if geo == "Italy" | geo == "France" | geo == "Germany" | g
 
 
 // Just an experiment trying to cluster countries based on productivity and wages
-egen mean_productivity = mean(productivity_pp), by(geo)
-collapse (mean) mean_wages mean_productivity, by(geo)
-cluster kmeans mean_wages mean_productivity, k(3) name(Clusters)
-cluster list
-generate cluster_id = Clusters
-sort cluster_id
-list geo cluster_id mean_wages mean_productivity
-twoway (scatter mean_wages mean_productivity if cluster_id == 1, mcolor(blue)) ///
-        (scatter mean_wages mean_productivity if cluster_id == 2, mcolor(red)) ///
-		(scatter mean_wages mean_productivity if cluster_id == 3, mcolor(green)), ///
-		legend(label(1 "cluster_id == 1") label(2 "cluster_id == 2") label(3 "cluster_id == 3"))
+//egen mean_productivity = mean(productivity_pp), by(geo)
+//collapse (mean) mean_wages mean_productivity, by(geo)
+//cluster kmeans mean_wages mean_productivity, k(3) name(Clusters)
+//cluster list
+//generate cluster_id = Clusters
+//sort cluster_id
+//list geo cluster_id mean_wages mean_productivity
+//twoway (scatter mean_wages mean_productivity if cluster_id == 1, mcolor(blue)) ///
+ //       (scatter mean_wages mean_productivity if cluster_id == 2, mcolor(red)) ///
+//		(scatter mean_wages mean_productivity if cluster_id == 3, mcolor(green)), ///
+//		legend(label(1 "cluster_id == 1") label(2 "cluster_id == 2") label(3 "cluster_id == 3"))
 
+// Regression with all uncorellated control variables and past productivity
+reghdfe pct_change_wages pct_change_productivity_1 pct_change_gdp tradeunion_density pct_change_hicp business_investment middle_education high_education partime_contracts training_education_l4w unemployment, absorb(geo year) vce (robust)	
+vif, uncentered		
+
+
+// Standardise data for PCA
+foreach var in pct_change_gdp tradeunion_density pct_change_hicp business_investment middle_education high_education partime_contracts training_education_l4w unemployment {
+    egen z_`var' = std(`var')
+}
+// Verify 
+summarize z_*
+
+* Run PCA on standardized variables
+pca z_pct_change_gdp z_tradeunion_density z_pct_change_hicp z_business_investment z_middle_education z_high_education z_partime_contracts z_training_education_l4w z_unemployment
+
+* Display scree plot to help decide number of components
+screeplot
+
+* Show eigenvalues
+estat smc // 7 components
+
+* Allow choosing number of components
+pca z_pct_change_gdp z_tradeunion_density z_pct_change_hicp z_business_investment z_middle_education z_high_education z_partime_contracts z_training_education_l4w z_unemployment, components(7)
+
+* Get component loadings
+estat loadings
+
+* Predict component scores (replace # with chosen number)
+predict pc1 pc2 pc3 pc4 pc5 pc6 pc7
+
+* Optional: rotate factors for easier interpretation
+rotate, varimax
+
+// regression with PCA
+reghdfe pct_change_wages pct_change_productivity_1 pc1 pc2 pc3 pc4 pc5 pc6 pc7, absorb(geo year) vce (robust)	
+vif, uncentered		
+
+reghdfe pct_change_wages pct_change_productivity_1 pc1 pc2 pc3 pc4 pc5 pc6 pc7 if mean_wages <= 20, absorb(geo year) vce (robust)
+vif, uncentered
+
+reghdfe pct_change_wages pct_change_productivity_1 pc1 pc2 pc3 pc4 pc5 pc6 pc7 if mean_wages > 20, absorb(geo year) vce (robust)
+vif, uncentered
