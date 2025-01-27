@@ -1,0 +1,30 @@
+	(1)
+VARIABLES	pct_change_wages
+	
+pct_change_productivity_1	0.123
+	(0.121)
+pct_change_gdp	0.264*
+	(0.137)
+tradeunion_density	0.256*
+	(0.140)
+pct_change_hicp	-1.702***
+	(0.462)
+business_investment	-0.0821
+	(0.0935)
+middle_education	-0.128
+	(0.127)
+high_education	0.101
+	(0.143)
+partime_contracts	0.375
+	(0.392)
+training_education_l4w	-0.0164
+	(0.180)
+unemployment	-0.858***
+	(0.132)
+Constant	0.706
+	(10.76)
+	
+Observations	196
+R-squared	0.489
+Robust standard errors in parentheses	
+*** p<0.01, ** p<0.05, * p<0.1	
