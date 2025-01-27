@@ -20,6 +20,10 @@ library(readxl)
     }
   }
   
+  
+  
+  
+  
   # Check the created data frames
   ls()
   
@@ -179,8 +183,28 @@ library(readxl)
   
   
   
-  write.csv(result_df_clean, "merged1.csv", row.names = FALSE)
+  #write.csv(result_df_clean, "merged1.csv", row.names = FALSE)
   
   # Save as Stata format (requires haven package)
-  library(haven)
-  write_dta(result_df_clean, "merged1.dta")
+  #library(haven)
+  #write_dta(result_df_clean, "merged1.dta")
+  
+  
+  
+  
+  
+#install.packages("xtable")
+library(xtable)
+latex_table <- xtable(result_df_clean)
+  
+# Print LaTeX code for the table
+print(latex_table)
+
+
+
+install.packages("stargazer")
+library(stargazer)
+stargazer(result_df_clean, type = "latex", summary = TRUE, title = "Descriptive Statistics", digits = 2)
+
+
+colnames(result_df_clean)
