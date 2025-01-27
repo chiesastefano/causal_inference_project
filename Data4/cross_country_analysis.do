@@ -37,6 +37,9 @@ pwcorr hourly_wages pct_change_wages hicp business_investment ///
 matrix corrmatrix = r(C)
 heatplot corrmatrix, lower values(format(%9.1f)) legend(off)  ///
          title("Correlation Heatmap") xlabel(, angle(45))
+graph export "Charts\Correlations.jpg", as(jpg) name("Graph") quality(100)
+
+
 // from the above, we can't include in the same model:
 // - productivity and its lag, due to perfect multicollinearity 
 // - low_education and middle_education, due to multicollinearity 
@@ -94,7 +97,9 @@ vif, uncentered
 
 // distribution of wages among countries
 
-graph box hourly_wages, over(geo, label(angle(45)))
+graph box hourly_wages, over(geo, label(angle(45))) yline(20, lcolor(red) lwidth(medium))
+graph export "Charts\Wages_distribuiton.jpg", as(jpg) name("Graph") quality(100)
+
 // from the graph above, it is quite visible division between countries with threshold of 20, so wanted to check their difference
 
 // checking what if divide wages by threshold of 20
@@ -144,7 +149,7 @@ xtline productivity_1 if geo == "Italy" | geo == "France" | geo == "Germany" | g
 //		(scatter mean_wages mean_productivity if cluster_id == 3, mcolor(green)), ///
 //		legend(label(1 "cluster_id == 1") label(2 "cluster_id == 2") label(3 "cluster_id == 3"))
 
-// Regression with all uncorellated control variables and past productivity
+// Regression with all uncorellated control variables and past percentage change of productivity
 reghdfe pct_change_wages pct_change_productivity_1 pct_change_gdp tradeunion_density pct_change_hicp business_investment middle_education high_education partime_contracts training_education_l4w unemployment, absorb(geo year) vce (robust)	
 vif, uncentered		
 
