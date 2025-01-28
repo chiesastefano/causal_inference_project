@@ -1,0 +1,26 @@
+		(1)
+VARIABLES	LABELS	Percentage change in hourly wages compared to previous year
+		
+pct_change_productivity_1	Lagged percentage change in productivity compared to previous year	0.243
+		(0.341)
+pc1	Scores for component 1	9.801**
+		(4.532)
+pc2	Scores for component 2	0.424
+		(1.661)
+pc3	Scores for component 3	1.888
+		(2.332)
+pc4	Scores for component 4	-2.264
+		(1.894)
+pc5	Scores for component 5	-7.580*
+		(4.076)
+pc6	Scores for component 6	-0.614
+		(2.356)
+pc7	Scores for component 7	-3.809
+		(3.357)
+Constant	Constant	15.80**
+		(6.782)
+		
+Observations		79
+R-squared		0.607
+Robust standard errors in parentheses		
+*** p<0.01, ** p<0.05, * p<0.1		

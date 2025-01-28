@@ -183,11 +183,20 @@ predict pc1 pc2 pc3 pc4 pc5 pc6 pc7
 rotate, varimax
 
 // regression with PCA
-reghdfe pct_change_wages pct_change_productivity_1 pc1 pc2 pc3 pc4 pc5 pc6 pc7, absorb(geo year) vce (robust)	
+reghdfe pct_change_wages pct_change_productivity_1 pc1 pc2 pc3 pc4 pc5 pc6 pc7, absorb(geo year) vce (robust)
+outreg2 using regression_pca_results.tex, replace tex label	
 vif, uncentered		
+//ssc install outreg2
+
+
 
 reghdfe pct_change_wages pct_change_productivity_1 pc1 pc2 pc3 pc4 pc5 pc6 pc7 if mean_wages <= 20, absorb(geo year) vce (robust)
+outreg2 using regression_grp1.tex, replace tex label	
 vif, uncentered
 
 reghdfe pct_change_wages pct_change_productivity_1 pc1 pc2 pc3 pc4 pc5 pc6 pc7 if mean_wages > 20, absorb(geo year) vce (robust)
+outreg2 using regression_grp2.tex, replace tex label	
 vif, uncentered
+
+
+
