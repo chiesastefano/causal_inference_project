@@ -38,7 +38,8 @@ pwcorr hourly_wages pct_change_wages hicp business_investment ///
 matrix corrmatrix = r(C)
 heatplot corrmatrix, lower values(format(%9.1f)) legend(off)  ///
          title("Correlation Heatmap") xlabel(, angle(45))
-graph export "Charts\Correlations.jpg", as(jpg) name("Graph") quality(100)
+// graph export "Charts\Correlations.jpg", as(jpg) name("Graph") quality(100)
+
 // from the above, we can't include in the same model:
 // - productivity and its lag, due to perfect multicollinearity 
 // - low_education and middle_education, due to multicollinearity 
@@ -46,7 +47,7 @@ graph export "Charts\Correlations.jpg", as(jpg) name("Graph") quality(100)
 
 // distribution of wages among countries
 graph box hourly_wages, over(geo, label(angle(45))) yline(20, lcolor(red) lwidth(medium))
-graph export "Charts\Wages_distribuiton.jpg", as(jpg) name("Graph") quality(100)
+// graph export "Charts\Wages_distribuiton.jpg", as(jpg) name("Graph") quality(100)
 
 
 // Percentage change model
@@ -96,18 +97,15 @@ rotate, varimax
 
 // regression with PCA
 reghdfe pct_change_wages pct_change_productivity_1 pc1 pc2 pc3 pc4 pc5 pc6 pc7, absorb(geo year) vce (robust)
-outreg2 using regression_pca_results.tex, replace tex label	
+outreg2 using "Tables/regression_pca_results.tex", replace tex label	
 vif, uncentered		
 
 
 // Robustness checks
 reghdfe pct_change_wages pct_change_productivity_1 pc1 pc2 pc3 pc4 pc5 pc6 pc7 if mean_wages <= 20, absorb(geo year) vce (robust)
-outreg2 using regression_grp1.tex, replace tex label	
+outreg2 using "Tables/regression_grp1.tex", replace tex label	
 vif, uncentered
 
 reghdfe pct_change_wages pct_change_productivity_1 pc1 pc2 pc3 pc4 pc5 pc6 pc7 if mean_wages > 20, absorb(geo year) vce (robust)
-outreg2 using regression_grp2.tex, replace tex label	
+outreg2 using "Tables/regression_grp2.tex", replace tex label	
 vif, uncentered
-
-
-
